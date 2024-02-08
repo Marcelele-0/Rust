@@ -1,6 +1,6 @@
 fn main() {
     //control flow
-    let if_num = 5;
+    let if_num: i32 = 5;
 
     if if_num < 10 {        // have to be a boolean 
         println!("first con was true")
