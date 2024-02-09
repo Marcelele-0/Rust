@@ -60,6 +60,3 @@ fn main() {
         a_string  
     } 
 }
-
-
-
