@@ -59,31 +59,7 @@ fn main() {
         
         a_string  
     } 
-
-
-    // references and borrowing ///////////////////////////////////////////////////////////////////////////////////////
-
-    let s1 = String::from("hello");
-    let (s2, len) = calculate_length(s1);
-    println!("The length of '{}' is {}.", s2, len);
-
-    fn calculate_length(s: String) -> (String, usize) {
-        let length = s.len();
-        (s, length)
-    }
-    // bad way to do this, because s is moved to the function, and then moved back to the calling function
-    
-    let s1 = String::from("hello");
-    let len = calculate_length_fixed(&s1);
-    println!("The length of '{}' is {}.", s1, len);
-
-    fn calculate_length_fixed(s: &String) -> usize { // s is a reference to a String (& borrowing)
-        let length = s.len();
-        length
-    }
-
-
-
 }
+
 
 
