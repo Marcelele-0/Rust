@@ -1,25 +1,35 @@
-fn main() {
+fn main() { // slices do not take ownership of the data
     
     let s = String::from("hello world");
-    let hello = &s[0..5];
-    let world = &s[6..11];
+    let s2 = "hello world";
 
-    let word = first_word(&s);
+    let word = first_word(s2);
+    println!("The first word is: {}", word);
 
-    s.clear(); // error!
+    ///////// slicing arrays
 
-    fn first_word(s: &str) -> usize {
-        let bytes = s.as_bytes();
+    let a = [1, 2, 3, 4, 5];
+    let slice = &a[..2]; 
 
-        for (i, &item) in bytes.iter().enumerate() {
-            if item == b' ' {
-                return i;
-            }
+    println!("The slice is: {:?}", slice); // its not just {} because its an array, and it needs to be printed with debug formatting
+}
+
+    
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[..i];
         }
-
-        s.len()
-        
     }
 
+    &s[..]
+    
+
+
+
 }
+
+
 
