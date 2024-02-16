@@ -14,7 +14,29 @@ impl GameState {
     }
 }
 
-struct RandomEvent {
+struct Crature {
+    name: String,
+    health: i32,
+    attack: i32,
+    defense: i32,
+}
+
+impl Crature {
+    fn fight(&mut self, other: &mut Crature) {
+        let attacks_to_kill = (other.health / (self.attack - other.defense)) as i32;
+        let attacks_to_die = (self.health / (other.attack - self.defense)) as i32;
+        if attacks_to_kill <= attacks_to_die {
+            other.health -= attacks_to_kill * (self.attack - other.defense);
+            println!("{} killed {}", self.name, other.name);
+        } else {
+            self.health -= attacks_to_die * (other.attack - self.defense);
+            println!("{} killed {}", other.name, self.name);
+        }
+    }    
+}
+
+
+struct TravelingEvent {
     location: String,
     description: String,
     choice1: String,
@@ -23,9 +45,9 @@ struct RandomEvent {
     outcome2: String,
 }
 
-impl RandomEvent {
+impl TravelingEvent {
     fn new(location: &str, description: &str, choice1: &str, choice2: &str, outcome1: &str, outcome2: &str) -> Self {
-        RandomEvent {
+        TravelingEvent {
             location: location.to_string(),
             description: description.to_string(),
             choice1: choice1.to_string(),
@@ -46,30 +68,54 @@ impl RandomEvent {
 fn main() {
     let mut game_state = GameState::new("Start");
 
-    // Define an event. In a more complex game, these could come from a file or database.
-    let start_event = RandomEvent::new(
+    let start_event = TravelingEvent::new(
         "Start",
         "You are at a crossroad. Which path will you take?",
         "Take the left path to the castle",
         "Take the right path to the forest",
-        "Castle",  // Assuming transition to "Castle"
-        "Forest",  // Assuming transition to "Forest"
+        "Castle",
+        "Forest",
     );
 
-    let castle_event = RandomEvent::new(
+    let castle_event = TravelingEvent::new(
         "Castle",
         "You are at the castle. What will you do?",
         "Enter the castle",
         "Keep walking",
-        "Inside the castle",  // Assuming transition to "Inside the castle"
-        "Court",  // Assuming transition to "Start"
+        "Indoor",
+        "Court",
     );
+
+    let court_event = TravelingEvent::new(
+        "Court",
+        "You are in the court. What will you do?",
+        "Go to the blacksmith",
+        "Leave the castle",
+        "Blacksmith",
+        "Suspicious_bridge",
+    );
+
+    let mut player = Crature {
+        name: "Player".to_string(),
+        health: 100,
+        attack: 10,
+        defense: 5,
+    };
+
+    let mut phantom = Crature {
+        name: "Phantom".to_string(),
+        health: 50,
+        attack: 15,
+        defense: 3,
+    };
 
 
    loop {
     let current_event = match game_state.current_location.as_str() {
         "Start" => &start_event,
         "Castle" => &castle_event,
+        "Court" => &court_event,
+    
         _ => {
             println!("You are lost!");
             break;
