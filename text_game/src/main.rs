@@ -14,23 +14,35 @@ impl GameState {
     }
 }
 
-struct Crature {
+struct Creature {
     name: String,
-    health: i32,
-    attack: i32,
-    defense: i32,
+    health: u32,
+    attack: u32,
+    defense: u32,
 }
 
-impl Crature {
-    fn fight(&mut self, other: &mut Crature) {
-        let attacks_to_kill = (other.health / (self.attack - other.defense)) as i32;
-        let attacks_to_die = (self.health / (other.attack - self.defense)) as i32;
-        if attacks_to_kill <= attacks_to_die {
-            other.health -= attacks_to_kill * (self.attack - other.defense);
-            println!("{} killed {}", self.name, other.name);
+impl Creature {
+    fn fight(&mut self, other: &mut Creature) {
+        
+        if self.attack >= other.defense {
+            let attacks_to_kill = other.health / (self.attack - other.defense).max(1);
+            let attacks_to_die = self.health / (other.attack - self.defense).max(1); 
+            
+            if attacks_to_kill <= attacks_to_die {
+                println!("{} wins over {} in a deadly battle and learned through the fight.", self.name, other.name);
+                self.attack += other.attack / 2;
+                self.health = self.health+((attacks_to_kill - 1) * other.attack) + other.health / 2;
+                self.defense += other.defense / 2;
+                
+                println!("{}'s remaining health is {}", self.name, self.health);
+                println!("{}'s new attack is {}", self.name, self.attack);
+                println!("{}'s new defense is {}", self.name, self.defense);
+
+            } else {
+                println!("{} was too strong for {}, you lose.", other.name, self.name); 
+            }
         } else {
-            self.health -= attacks_to_die * (other.attack - self.defense);
-            println!("{} killed {}", other.name, self.name);
+            println!("{} is too strong for {}", other.name, self.name);
         }
     }    
 }
@@ -66,6 +78,8 @@ impl TravelingEvent {
 
 
 fn main() {
+    
+
     let mut game_state = GameState::new("Start");
 
     let start_event = TravelingEvent::new(
@@ -95,14 +109,16 @@ fn main() {
         "Suspicious_bridge",
     );
 
-    let mut player = Crature {
+
+
+    let mut player = Creature {
         name: "Player".to_string(),
         health: 100,
         attack: 10,
         defense: 5,
     };
 
-    let mut phantom = Crature {
+    let mut phantom = Creature {
         name: "Phantom".to_string(),
         health: 50,
         attack: 15,
@@ -115,11 +131,6 @@ fn main() {
         "Start" => &start_event,
         "Castle" => &castle_event,
         "Court" => &court_event,
-    
-        _ => {
-            println!("You are lost!");
-            break;
-        }
     };
     
     current_event.display();
