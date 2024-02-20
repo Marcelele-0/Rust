@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 struct GameState {
     current_location: String,
 }
@@ -17,7 +15,6 @@ impl GameState {
 }
 
 struct Creature {
-    location: String, // This might be unused based on our current setup but can be useful for expansions.
     name: String,
     health: u32,
     attack: u32,
@@ -25,40 +22,31 @@ struct Creature {
 }
 
 impl Creature {
-    fn new(location: &str, name: &str, health: u32, attack: u32, defense: u32) -> Self {
-        Creature {
-            location: location.to_string(),
-            name: name.to_string(),
-            health,
-            attack,
-            defense,
-        }
-    }
-
     fn fight(&mut self, other: &mut Creature) {
-        println!("{} encounters a {}!", self.name, other.name);
-        // Fight logic here. Keeping it as is from your original code.
+        
         if self.attack >= other.defense {
             let attacks_to_kill = other.health / (self.attack - other.defense).max(1);
-            let attacks_to_die = self.health / (other.attack - self.defense).max(1);
+            let attacks_to_die = self.health / (other.attack - self.defense).max(1); 
             
             if attacks_to_kill <= attacks_to_die {
                 println!("{} wins over {} in a deadly battle and learned through the fight.", self.name, other.name);
                 self.attack += other.attack / 2;
-                self.health = self.health + ((attacks_to_kill - 1) * other.attack) + other.health / 2;
+                self.health = self.health+((attacks_to_kill - 1) * other.attack) + other.health / 2;
                 self.defense += other.defense / 2;
                 
                 println!("{}'s remaining health is {}", self.name, self.health);
                 println!("{}'s new attack is {}", self.name, self.attack);
                 println!("{}'s new defense is {}", self.name, self.defense);
+
             } else {
                 println!("{} was too strong for {}, you lose.", other.name, self.name); 
             }
         } else {
             println!("{} is too strong for {}", other.name, self.name);
         }
-    }
+    }    
 }
+
 
 struct TravelingEvent {
     location: String,
@@ -88,32 +76,7 @@ impl TravelingEvent {
     }
 }
 
-enum GameEvent {
-    Traveling(TravelingEvent),
-    Combat(Creature),
-}
-
-
-trait Event {
-    fn execute(&self, game_state: &mut GameState, player: &mut Creature);
-}
-
-impl Event for GameEvent {
-    fn execute(&self, game_state: &mut GameState, player: &mut Creature) {
-        match self {
-            GameEvent::Traveling(event) => {
-                event.display();
-            },
-            GameEvent::Combat(enemy) => {
-                player.fight(enemy);
-            },
-        }
-    }
-}
-
 fn main() {
-    
-
     let mut game_state = GameState::new("Start");
 
     let start_event = TravelingEvent::new(
@@ -153,7 +116,6 @@ fn main() {
     };
 
     let mut phantom = Creature {
-        location : "Suspicous_bridge".to_string(),
         name: "Phantom".to_string(),
         health: 50,
         attack: 15,
@@ -166,8 +128,15 @@ fn main() {
         "Start" => &start_event,
         "Castle" => &castle_event,
         "Court" => &court_event,
+        "Suspicious_bridge" => {
+            player.fight(&mut phantom);
+            game_state.transition("Start");
+            &start_event
+        },
+        
+        _ => panic!("Invalid location"),
     };
-    
+
     current_event.display();
 
     println!("Enter your choice (number):");
@@ -190,4 +159,6 @@ fn main() {
 
     println!("You are now at: {}", game_state.current_location);
    }
+
+   
 }
