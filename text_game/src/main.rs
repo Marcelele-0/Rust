@@ -13,7 +13,7 @@ impl GameState {
         self.current_location = new_location.to_string();
     }
 }
-
+#[derive(Clone)]
 struct Creature {
     name: String,
     health: u32,
@@ -21,7 +21,16 @@ struct Creature {
     defense: u32,
 }
 
+
 impl Creature {
+    fn new(name: &str, health: u32, attack: u32, defense: u32) -> Self {
+        Creature {
+            name: name.to_string(),
+            health,
+            attack,
+            defense,
+        }
+    }
     fn fight(&mut self, other: &mut Creature) {
         
         if self.attack >= other.defense {
@@ -31,7 +40,7 @@ impl Creature {
             if attacks_to_kill <= attacks_to_die {
                 println!("{} wins over {} in a deadly battle and learned through the fight.", self.name, other.name);
                 self.attack += other.attack / 2;
-                self.health = self.health+((attacks_to_kill - 1) * other.attack) + other.health / 2;
+                self.health = self.health-((attacks_to_kill - 1) * other.attack) + other.health / 2;
                 self.defense += other.defense / 2;
                 
                 println!("{}'s remaining health is {}", self.name, self.health);
@@ -48,7 +57,7 @@ impl Creature {
 }
 
 
-struct TravelingEvent {
+struct TravelingChoice {
     location: String,
     description: String,
     choice1: String,
@@ -57,9 +66,9 @@ struct TravelingEvent {
     outcome2: String,
 }
 
-impl TravelingEvent {
+impl TravelingChoice {
     fn new(location: &str, description: &str, choice1: &str, choice2: &str, outcome1: &str, outcome2: &str) -> Self {
-        TravelingEvent {
+        TravelingChoice {
             location: location.to_string(),
             description: description.to_string(),
             choice1: choice1.to_string(),
@@ -75,90 +84,83 @@ impl TravelingEvent {
         println!("2: {}", self.choice2);
     }
 }
+enum GameEvent {
+    TravelingEvent(TravelingChoice),
+    CombatEvent(Creature),
+}
+
+use std::collections::HashMap;
 
 fn main() {
+    let mut game_events: HashMap<String, GameEvent> = HashMap::new();
     let mut game_state = GameState::new("Start");
 
-    let start_event = TravelingEvent::new(
+    game_events.insert("Start".to_string(), GameEvent::TravelingEvent(TravelingChoice::new(
         "Start",
         "You are at a crossroad. Which path will you take?",
-        "Take the left path to the castle",
-        "Take the right path to the forest",
+        "Go to Castle",
+        "Go to Forest",
         "Castle",
         "Forest",
-    );
+    )));
 
-    let castle_event = TravelingEvent::new(
+    game_events.insert("Castle".to_string(), GameEvent::TravelingEvent(TravelingChoice::new(
         "Castle",
         "You are at the castle. What will you do?",
         "Enter the castle",
         "Keep walking",
         "Indoor",
         "Court",
-    );
+    )));
 
-    let court_event = TravelingEvent::new(
+    game_events.insert("Court".to_string(), GameEvent::TravelingEvent(TravelingChoice::new(
         "Court",
         "You are in the court. What will you do?",
         "Go to the blacksmith",
         "Leave the castle",
         "Blacksmith",
         "Suspicious_bridge",
-    );
+    )));
 
+    game_events.insert("Suspicious_bridge".to_string(), GameEvent::CombatEvent(Creature::new(
+        "Phantom", 
+        50, 
+        15, 
+        3,
+    )));
 
+    let mut player = Creature::new("Player", 100, 10, 5);
 
-    let mut player = Creature {
-        name: "Player".to_string(),
-        health: 100,
-        attack: 10,
-        defense: 5,
-    };
+    loop {
+        if let Some(event) = game_events.get(&game_state.current_location) {
+            match event {
+                GameEvent::TravelingEvent(traveling_choice) => {
+                    traveling_choice.display();
 
-    let mut phantom = Creature {
-        name: "Phantom".to_string(),
-        health: 50,
-        attack: 15,
-        defense: 3,
-    };
+                    println!("Enter your choice (number): ");
+                    let mut choice = String::new();
+                    std::io::stdin().read_line(&mut choice).expect("Failed to read line");
+                    let choice: usize = choice.trim().parse().expect("Please enter a number");
 
+                    match choice {
+                        1 => game_state.transition(&traveling_choice.outcome1),
+                        2 => game_state.transition(&traveling_choice.outcome2),
+                        3 => break,
+                        _ => println!("Invalid choice, please enter 1 or 2."),
+                    }
+                },
+                GameEvent::CombatEvent(creature) => {
+                    let mut enemy = creature.clone();
+                    player.fight(&mut enemy);
 
-   loop {
-    let current_event = match game_state.current_location.as_str() {
-        "Start" => &start_event,
-        "Castle" => &castle_event,
-        "Court" => &court_event,
-        "Suspicious_bridge" => {
-            player.fight(&mut phantom);
-            game_state.transition("Start");
-            &start_event
-        },
-        
-        _ => panic!("Invalid location"),
-    };
+                    game_state.transition("Start"); 
+                },
+            }
+        } else {
+            println!("You wander into unknown territory.");
+            break;
+        }
 
-    current_event.display();
-
-    println!("Enter your choice (number):");
-    let mut choice = String::new();
-    std::io::stdin().read_line(&mut choice).expect("Failed to read line");
-    let choice: usize = choice.trim().parse().expect("Please enter a number");
-
-    
-    match choice {
-        1 => {
-            println!("You chose: {}", current_event.choice1);
-            game_state.transition(&current_event.outcome1);
-        },
-        2 => {
-            println!("You chose: {}", current_event.choice2);
-            game_state.transition(&current_event.outcome2);
-        },
-        _ => println!("Invalid choice, please enter 1 or 2."),
+        println!("You are now at: {}", game_state.current_location);
     }
-
-    println!("You are now at: {}", game_state.current_location);
-   }
-
-   
 }
