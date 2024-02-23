@@ -1,95 +1,13 @@
-struct GameState {
-    current_location: String,
-}
-
-impl GameState {
-    fn new(start_location: &str) -> Self {
-        GameState {
-            current_location: start_location.to_string(),
-        }
-    }
-
-    fn transition(&mut self, new_location: &str) {
-        self.current_location = new_location.to_string();
-    }
-}
-#[derive(Clone)]
-struct Creature {
-    name: String,
-    health: u32,
-    attack: u32,
-    defense: u32,
-}
-
-
-impl Creature {
-    fn new(name: &str, health: u32, attack: u32, defense: u32) -> Self {
-        Creature {
-            name: name.to_string(),
-            health,
-            attack,
-            defense,
-        }
-    }
-    fn fight(&mut self, other: &mut Creature) {
-        
-        if self.attack >= other.defense {
-            let attacks_to_kill = other.health / (self.attack - other.defense).max(1);
-            let attacks_to_die = self.health / (other.attack - self.defense).max(1); 
-            
-            if attacks_to_kill <= attacks_to_die {
-                println!("{} wins over {} in a deadly battle and learned through the fight.", self.name, other.name);
-                self.attack += other.attack / 2;
-                self.health = self.health-((attacks_to_kill - 1) * other.attack) + other.health / 2;
-                self.defense += other.defense / 2;
-                
-                println!("{}'s remaining health is {}", self.name, self.health);
-                println!("{}'s new attack is {}", self.name, self.attack);
-                println!("{}'s new defense is {}", self.name, self.defense);
-
-            } else {
-                println!("{} was too strong for {}, you lose.", other.name, self.name); 
-            }
-        } else {
-            println!("{} is too strong for {}", other.name, self.name);
-        }
-    }    
-}
-
-
-struct TravelingChoice {
-    location: String,
-    description: String,
-    choice1: String,
-    choice2: String,
-    outcome1: String,
-    outcome2: String,
-}
-
-impl TravelingChoice {
-    fn new(location: &str, description: &str, choice1: &str, choice2: &str, outcome1: &str, outcome2: &str) -> Self {
-        TravelingChoice {
-            location: location.to_string(),
-            description: description.to_string(),
-            choice1: choice1.to_string(),
-            choice2: choice2.to_string(),
-            outcome1: outcome1.to_string(),
-            outcome2: outcome2.to_string(),
-        }
-    }
-
-    fn display(&self) {
-        println!("{}", self.description);
-        println!("1: {}", self.choice1);
-        println!("2: {}", self.choice2);
-    }
-}
-enum GameEvent {
-    TravelingEvent(TravelingChoice),
-    CombatEvent(Creature),
-}
-
 use std::collections::HashMap;
+mod creatures;
+mod events;
+
+
+use crate::creatures::{Creature, phantom};
+use crate::game_state::GameState;
+use crate::traveling_choice::TravelingChoice;
+use crate::creatures::{Creature, phantom};
+use crate::events::{TravelingChoice, GameEvent};
 
 fn main() {
     let mut game_events: HashMap<String, GameEvent> = HashMap::new();
