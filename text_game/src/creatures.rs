@@ -1,3 +1,5 @@
+// creautres.rs
+
 #[derive(Clone)]
 pub struct Creature {
     pub name: String,
@@ -16,7 +18,6 @@ impl Creature {
         }
     }
 
-    // The fight method remains within the Creature implementation
     pub fn fight(&mut self, other: &mut Creature) {
         if self.attack >= other.defense {
             let attacks_to_kill = other.health / (self.attack - other.defense).max(1);
@@ -38,8 +39,4 @@ impl Creature {
             println!("{} is too strong for {}", other.name, self.name);
         }
     }
-}
-
-pub fn phantom() -> Creature {
-    Creature::new("Phantom", 50, 15, 3)
 }

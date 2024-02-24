@@ -1,13 +1,15 @@
+//main.rs
+
 use std::collections::HashMap;
+
 mod creatures;
 mod events;
+mod game_state;
 
-
-use crate::creatures::{Creature, phantom};
+use crate::creatures::Creature;
 use crate::game_state::GameState;
-use crate::traveling_choice::TravelingChoice;
-use crate::creatures::{Creature, phantom};
-use crate::events::{TravelingChoice, GameEvent};
+use crate::events::TravelingChoice;
+use crate::events::GameEvent;
 
 fn main() {
     let mut game_events: HashMap<String, GameEvent> = HashMap::new();

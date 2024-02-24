@@ -1,3 +1,5 @@
+// events.rs
+
 use crate::Creature;
 
 pub struct TravelingChoice {
@@ -19,6 +21,12 @@ impl TravelingChoice {
             outcome1: outcome1.to_string(),
             outcome2: outcome2.to_string(),
         }
+    }
+
+    pub fn display(&self) {
+        println!("\n{}", self.description);
+        println!("1: {}", self.choice1);
+        println!("2: {}", self.choice2);
     }
 }
 
