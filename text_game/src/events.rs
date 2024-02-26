@@ -30,7 +30,6 @@ impl TravelingChoice {
     }
 }
 
-// Assuming GameEvent enum needs to be accessible
 pub enum GameEvent {
     TravelingEvent(TravelingChoice),
     CombatEvent(Creature),

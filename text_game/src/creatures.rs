@@ -6,15 +6,17 @@ pub struct Creature {
     pub health: u32,
     pub attack: u32,
     pub defense: u32,
+    pub post_location: String,
 }
 
 impl Creature {
-    pub fn new(name: &str, health: u32, attack: u32, defense: u32) -> Self {
+    pub fn new(name: &str, health: u32, attack: u32, defense: u32, post_location: &str) -> Self {
         Creature {
             name: name.to_string(),
             health,
             attack,
             defense,
+            post_location: post_location.to_string(),
         }
     }
 

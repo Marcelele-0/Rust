@@ -47,9 +47,11 @@ fn main() {
         50, 
         15, 
         3,
+        "bridge ruins",
     )));
 
-    let mut player = Creature::new("Player", 100, 10, 5);
+
+    let mut player = Creature::new("Player", 100, 10, 5," ",);
 
     loop {
         if let Some(event) = game_events.get(&game_state.current_location) {
@@ -73,7 +75,7 @@ fn main() {
                     let mut enemy = creature.clone();
                     player.fight(&mut enemy);
 
-                    game_state.transition("Start"); 
+                    game_state.transition(&enemy.post_location); 
                 },
             }
         } else {

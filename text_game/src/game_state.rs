@@ -1,5 +1,3 @@
-// game_state.rs
-
 pub struct GameState {
     pub current_location: String,
 }
