@@ -21,17 +21,22 @@ fn main() {
         &[
             ("Go to Castle".to_string(),"castle".to_string()),
             ("Go to Forest".to_string(),"forest".to_string())
-        ]
+        ],
+        None,
     )));
 
-    game_events.insert("Crossroad".to_string(), GameEvent::CombatEvent(Creature::new(
-        "Wolf",
-        50, 
-        5, 
-        2, 
-        "River")));
+    game_events.insert("castle".to_string(), GameEvent::TravelingDualEvent(TravelingDualChoice::new(
+        "Castle",
+        "You are at the castle. What will you do?",
+        &[
+            ("Enter the castle".to_string(),"castle_entrance".to_string()),
+            ("Go back to the crossroad".to_string(),"crossroad".to_string())
+        ],
+        Some(Creature::new("Wolf", 50, 5, 2,))
+    )));
 
-    let mut player = Creature::new("Player", 100, 10, 5," ",);
+
+    let mut player = Creature::new("Player", 100, 10, 5);
 
     loop {
         if let Some(event) = game_events.get(&game_state.current_location) {
@@ -58,11 +63,9 @@ fn main() {
                     }
                 }
                 
-                GameEvent::CombatEvent(creature) => {
+                GameEvent::EncounterEvent(creature) => {
                     let mut enemy = creature.clone();
                     player.fight(&mut enemy);
-
-                    game_state.transition(&enemy.post_location); 
                 }
             }
         } else {
