@@ -8,14 +8,14 @@ mod game_state;
 
 use crate::creatures::Creature;
 use crate::game_state::GameState;
-use crate::events::TravelingDualChoice;
+use crate::events::TravelChoice;
 use crate::events::GameEvent;
 
 fn main() {
     let mut game_events: HashMap<String, GameEvent> = HashMap::new();
     let mut game_state = GameState::new("Crossroad");
 
-    game_events.insert("Crossroad".to_string(), GameEvent::TravelingDualEvent(TravelingDualChoice::new(
+    game_events.insert("Crossroad".to_string(), GameEvent::TravelingEvent(TravelChoice::new(
         "Crossroad",
         "You are at a crossroad. Which path will you take?",
         &[
@@ -25,7 +25,7 @@ fn main() {
         None,
     )));
 
-    game_events.insert("castle".to_string(), GameEvent::TravelingDualEvent(TravelingDualChoice::new(
+    game_events.insert("castle".to_string(), GameEvent::TravelingEvent(TravelChoice::new(
         "Castle",
         "You are at the castle. What will you do?",
         &[
@@ -41,7 +41,7 @@ fn main() {
     loop {
         if let Some(event) = game_events.get(&game_state.current_location) {
             match event {
-                GameEvent::TravelingDualEvent(traveling_choice) => {
+                GameEvent::TravelingEvent(traveling_choice) => {
                     traveling_choice.display();
 
                     println!("Enter your choice (number): ");
@@ -63,7 +63,7 @@ fn main() {
                     }
                 }
                 
-                GameEvent::EncounterEvent(creature) => {
+                GameEvent::NeutralEncounterEvent(creature) => {
                     let mut enemy = creature.clone();
                     player.fight(&mut enemy);
                 }

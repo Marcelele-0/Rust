@@ -2,16 +2,16 @@
 
 use crate::creatures::Creature;
 
-pub struct TravelingDualChoice {
+pub struct TravelChoice {
     pub location: String,
     pub description: String,
     pub choices: Vec<(String, String)>,
     pub encounter: Option<Creature>,
 }
 
-impl TravelingDualChoice {
+impl TravelChoice {
     pub fn new(location: &str, description: &str, choices: &[(String, String)], encounter:Option<Creature>) -> Self {
-        TravelingDualChoice {
+        TravelChoice {
             location: location.to_string(),
             description: description.to_string(),
             choices: choices.to_vec(),
@@ -28,6 +28,13 @@ impl TravelingDualChoice {
 }
 
 pub enum GameEvent {
-    TravelingDualEvent(TravelingDualChoice),
-    EncounterEvent(Creature),
+    TravelingEvent(TravelChoice),
+    NeutralEncounterEvent(Creature),
 }
+
+/* To do
+implement functiction in struct crature to determine if the creature is hostile or neutral
+we can use hashmap to 
+
+might like to adjust the hash map in main game loop becouse its limited to 2 choices
+*/
